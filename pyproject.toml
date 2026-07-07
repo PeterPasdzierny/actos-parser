@@ -8,7 +8,7 @@ dependencies = [
 ]
 
 [project.scripts]
-actos-parser-nightly = "actos_parser:actos_parser"
+actos-parser = "actos_parser:actos_parser"
 
 [tool.setuptools]
 py-modules = [
