@@ -1,8 +1,7 @@
 from argparse import ArgumentParser
 import csv
 from dataclasses import dataclass
-from datetime import timedelta, strftime
-from datetime.datetime import fromtimestamp
+from datetime import datetime, timedelta
 from pathlib import Path
 import re
 from struct import unpack
@@ -26,7 +25,7 @@ def get_cli_args():
     )
     argparser.add_argument(
         "--output",
-        help="Output directory for decoded flight data",
+        help="Optional non-default output directory for decoded flight data",
         required=False,
         type=Path,
     )
@@ -62,8 +61,8 @@ ptp_format = flight_cfg["defaults"]["timestamp_format"]
 
 def parse_ptp(ptp_raw, ptp_format):
     seconds, nanoseconds = unpack(">2I", ptp_raw)
-    ptp = fromtimestamp(seconds) + timedelta(microseconds=nanoseconds / 1000)
-    return strftime(ptp, ptp_format)
+    ptp = datetime.fromtimestamp(seconds) + timedelta(microseconds=nanoseconds / 1000)
+    return datetime.strftime(ptp, ptp_format)
 
 
 def reassamble_fragmented_telegrams(packets_per_telegram, telegrams):
