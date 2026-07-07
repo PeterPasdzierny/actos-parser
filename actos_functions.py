@@ -19,7 +19,7 @@ def get_cli_args():
     argparser.add_argument(
         "--flights",
         nargs="+",
-        help="List of ACTOS flight directories to process",
+        help="List of ACTOS pcap file directories to process",
         required=True,
         type=Path,
     )
@@ -70,8 +70,11 @@ def reassamble_fragmented_telegrams(packets_per_telegram, telegrams):
         payload = b"".join(
             telegrams[i + j].payload for j in range(packets_per_telegram)
         )
-
         yield Telegram(ptp=telegrams[i].ptp, payload=payload)
+
+
+def format_for_raw_export(telegrams):
+    yield from ((parse_ptp(t.ptp, ptp_format), t.payload.hex()) for t in telegrams)
 
 
 def decode(sid, telegrams):
@@ -88,15 +91,23 @@ def decode(sid, telegrams):
 
 
 def decode_ascii(sid, telegrams):
+    yield from (
+        Telegram(
+            ptp=parse_ptp(t.ptp, ptp_format),
+            payload=t.payload.decode("ascii", errors="ignore"),
+        )
+        for t in telegrams
+    )
+
+
+def clean_ascii(sid, telegrams):
     pattern = re.compile("|".join(flight_cfg[sid]["cleaning_regex"]))
-    comma_collapse = re.compile(r",+")
+    dedublicate_commas = re.compile(r",+")
     for t in telegrams:
-        ptp = parse_ptp(t.ptp, ptp_format)
-        decoded = t.payload.decode("ascii", errors="ignore")
-        cleaned = pattern.sub(",", decoded)
-        cleaned = comma_collapse.sub(",", cleaned).strip(",")
-        values = cleaned.split(",")
-        yield (ptp, *values)
+        cleaned_payload = pattern.sub(",", t.payload)
+        cleaned_payload = dedublicate_commas.sub(",", cleaned_payload).strip(",")
+        parameter_list = cleaned_payload.split(",")
+        yield (t.ptp, *parameter_list)
 
 
 def decode_binary(sid, telegrams):

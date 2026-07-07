@@ -189,7 +189,7 @@ abc10e:
   packet_type: packetizer
   encoding: binary
   binary_format: ">8HI5H31I6s256IH"
-  export_raw_data: True
+  export_raw_telegrams: True
   packets_per_telegram: 3
 
 abc11e:
