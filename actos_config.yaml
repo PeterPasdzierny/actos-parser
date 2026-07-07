@@ -1,0 +1,515 @@
+# ACTOS config C3SAR 2026
+
+defaults:
+  timestamp_name: DATETIME
+  timestamp_format: "%Y-%m-%dT%H:%M:%S.%f"
+  output_subdir: l1_decoded_data
+
+abc00e:
+  name: PTB
+  instruments:
+    - PTB
+  parameters:
+    - PRESSURE
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.]+'
+
+abc01e:
+  name: HMP
+  instruments:
+    - HMP
+  parameters:
+    - RH
+    - TEMPERATURE
+    - DEWPOINT
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.]+'
+
+abc04e:
+  name: STAP
+  instruments:
+    - STAP
+  parameters:
+    - INVMM_R
+    - INVMM_G
+    - INVMM_B
+    - RED_SMP
+    - RED_REF
+    - GRN_SMP
+    - GRN_REF
+    - BLU_SMP
+    - BLU_REF
+    - BLK_SMP
+    - BLK_REF
+    - SMP_FLW
+    - SMP_TMP
+    - SMP_PRS
+    - PUMP_PW
+    - PSVOLTS
+    - ERR_RPT
+    - CNTDOWN
+    - FLTSTAT
+    - FLOW_SP
+    - INTERVL
+    - STAPCTL
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.]+'
+
+abc05e:
+  name: POPS
+  instruments:
+    - POPS
+  parameters:
+    - DATETIME_POPS
+    - PARTCT
+    - PARTCON
+    - BL
+    - STD
+    - P
+    - POPS_FLOW
+    - LDTEMP
+    - LD_MON
+    - TEMP
+    - B0
+    - B1
+    - B2
+    - B3
+    - B4
+    - B5
+    - B6
+    - B7
+    - B8
+    - B9
+    - B10
+    - B11
+    - B12
+    - B13
+    - B14
+    - B15
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.naT]+'
+
+abc06e:
+  name: MCPC
+  instruments:
+    - MCPC
+  parameters:
+    - CONCENT
+    - RAWCONC
+    - CNT_SEC
+    - CONDTMP
+    - SATTTMP
+    - SATBTMP
+    - OPTCTMP
+    - INLTTMP
+    - SMPFLOW
+    - SATFLOW
+    - PRESSUR
+    - CONDPWR
+    - SATTPWR
+    - SATBPWR
+    - OPTCPWR
+    - SATFPWR
+    - FILLCNT
+    - ERR_NUM
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.]+'
+
+abc07e:
+  name: MSEMS
+  instruments:
+    - MSEMS
+  parameters: (SEE BELOW)
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    # - 'scan_state=\d'
+    - '[^0-9\-.a-z\_\=]+'
+
+abc08e:
+  name: LICOR
+  instruments:
+    - LICOR
+  parameters:
+    - NDX
+    - DIAGVAL
+    - CO2_RAW
+    - CO2_D
+    - H2O_RAW
+    - H2O_D
+    - TEMP
+    - PRES
+    - AUX
+    - COOLER
+    - PLL
+    - DET_OK
+    - CHOPPER
+    - PATH
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - "CO2"
+    - "H2O"
+    - '[^0-9\-.a-z]+'
+    - "[a-z]{2,}"
+
+abc09e:
+  name: SONIC
+  instruments:
+    - SONIC
+  parameters:
+    - U
+    - V
+    - W
+    - T
+    - STATUS
+    - COUNTER
+    - CHECKSUM
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.a-z]+'
+
+abc10e:
+  name: CDP
+  instruments:
+    - CDP
+  parameters:
+    - TO BE DONE
+  packet_type: packetizer
+  encoding: binary
+  binary_format: ">8HI5H31I6s256IH"
+  export_raw_data: True
+  packets_per_telegram: 3
+
+abc11e:
+  name: LWC
+  instruments:
+    - DMT_LWC
+  parameters:
+    - UNKNOWN
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - '\$Fin-\d'
+    - '[^0-9\-.A-Z]+'
+
+abc12e:
+  name: CPCI
+  instruments:
+    - CPC_I
+  parameters:
+    - COUNT
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.]+'
+
+abc13e:
+  name: CPCII
+  instruments:
+    - CPC_II
+  parameters:
+    - COUNT
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.]+'
+
+abc14e:
+  name: AERORH
+  instruments:
+    - AERORH
+  parameters:
+    - DATETIME_AERORH
+    - TEMP_SHT
+    - PRESSURE_BMP
+    - HUMIDITY_SHT
+    - TEMP_HYT
+    - HUMIDITY_HYT
+    - TSI_FLOW
+    - TSI_TEMP
+    - TSI_PRESS
+    - ERROR_CODE
+  packet_type: packetizer
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.:\ ]+'
+
+00def0:
+  name: PTB
+  instruments:
+    - PTP
+  parameters:
+    - PRESSURE
+  packet_type: parser
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.]+'
+
+00def1:
+  name: HMP
+  instruments:
+    - HMP
+  parameters:
+    - DEWPOINT
+    - RH
+    - TEMPERATURE
+  packet_type: parser
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.]+'
+
+00def2:
+  name: CPCS
+  instruments:
+    - CPCI
+    - CPCII
+    - MCPC
+  parameters:
+    - CPC1
+    - CPC2
+    - MCPC
+  packet_type: parser
+  encoding: binary
+  binary_format: ">3H"
+
+00def3:
+  name: PVM
+  instruments:
+    - PVM
+    - LY_ALPHA
+  parameters:
+    - LWC
+    - PSA
+    - LY_ALPHA
+  packet_type: parser
+  encoding: binary
+  binary_format: ">6H"
+  commutation_factor: 2
+  voltage_ranges:
+    - [0, 5]
+    - [0, 5]
+    - [-5, 5]
+
+00def4:
+  name: DEWPOINT
+  instruments:
+    - DPTT
+    - PT100
+  parameters:
+    - T_DP
+    - T_REF
+    - T_TT
+    - PT_100
+  packet_type: parser
+  encoding: binary
+  binary_format: ">4H"
+  voltage_ranges:
+    - [-10, 10]
+    - [-10, 10]
+    - [-10, 10]
+    - [0, 10]
+
+00def5:
+  name: HOUSEKEEPING
+  instruments:
+    - HOUSEKEEPING
+    - FILTER
+  parameters:
+    - CWS_SWITCH
+    - FILTER_SWITCH
+    - TH_1
+    - TH_2
+    - U_12
+    - U_24
+    - U_28
+    - UM_15
+    - UP_15
+    - FILTER_1
+    - FILTER_2
+    - FILTER_3
+    - FILTER_4
+  packet_type: parser
+  encoding: binary
+  # binary_format: ">9H"
+  binary_format: ">13H"
+  voltage_ranges:
+    - [0, 10]
+    - [0, 10]
+    - [0, 10]
+    - [0, 10]
+    - [0, 10]
+    - [0, 10]
+    - [0, 10]
+    - [0, 10]
+    - [0, 10]
+    # - [0, 10]
+    # - [0, 10]
+    # - [0, 10]
+    # - [0, 10]
+
+00def6:
+  name: RADIATION
+  instruments:
+    - RADIATION
+  parameters:
+    - CGR4_DOWN
+    - CGR4_DOWN_T
+    - CGR4_UP
+    - CGR4_UP_T
+    - CMP22_DOWN
+    - CMP22_UP
+  packet_type: parser
+  encoding: binary
+  binary_format: ">6H"
+  voltage_ranges:
+    - [-0.02, 0.02]
+    - [-10, 10]
+    - [-0.02, 0.02]
+    - [-10, 10]
+    - [-0.02, 0.02]
+    - [-0.02, 0.02]
+
+00def7:
+  name: LICOR
+  instruments:
+    - LICOR
+    - PITOT
+  parameters:
+    - CO2
+    - H20
+    - PITOT_STATIC
+    - PITOT_HEATER
+  packet_type: parser
+  encoding: binary
+  binary_format: ">40H"
+  commutation_factor: 10
+  voltage_ranges:
+    - [0, 5]
+    - [0, 5]
+    - [-10, 10]
+    - [0, 10]
+
+00def8:
+  name: IMAR
+  instruments:
+    - IMAR
+  parameters:
+    - SYNC_12
+    - MSG_ID_12
+    - FRAME_COUNTER_12
+    - RESERVED_12
+    - MSG_LENGTH_12
+    - WEEK_12
+    - GPS_TOW_S_12
+    - GPS_TOW_MICRO_12
+    - LONGITUDE_12
+    - LATITUDE_12
+    - ALTITUDE
+    - UNDULATION
+    - V_NORTH
+    - V_EAST
+    - V_DOWN
+    - STDDEVLON
+    - STDDEVLAT
+    - STDALT
+    - STDDEVV_NORTH
+    - STDDEVV_EAST
+    - STDDEVV_DOWN
+    - SOLSTATUS
+    - POSVELTYPE
+    - PDOP
+    - SATSUSED
+    - SATSTRACKED
+    - STATION
+    - DIFFAGE
+    - SOLAGE
+    - GNSS_STATUS
+    - STATUS_12
+    - CRC16_12
+    - SYNC_02
+    - MSG_ID_02
+    - FRAME_COUNTER_02
+    - RESERVED_02
+    - MSG_LENGTH_02
+    - WEEK_02
+    - GPS_TOW_S_02
+    - GPS_TOW_MICRO_02
+    - ACC_X
+    - ACC_Y
+    - ACC_Z
+    - OMG_X
+    - OMG_Y
+    - OMG_Z
+    - STATUS_02
+    - CRC16_02
+    - SYNC_0A
+    - MSG_ID_0A
+    - FRAME_COUNTER_0A
+    - RESERVED_0A
+    - MSG_LENGTH_0A
+    - WEEK_0A
+    - GPS_TOW_S_0A
+    - GPS_TOW_MICRO_0A
+    - LONGITUDE_0A
+    - LATITUDE_0A
+    - HEIGHT
+    - STATUS_0A
+    - CRC16_0A
+    - SYNC_04
+    - MSG_ID_04
+    - FRAME_COUNTER_04
+    - RESERVED_04
+    - MSG_LENGTH_04
+    - WEEK_04
+    - GPS_TOW_S_04
+    - GPS_TOW_MICRO_04
+    - ROLL
+    - PITCH
+    - YAW
+    - STATUS_04
+    - CRC16_04
+    - SYNC_09
+    - MSG_ID_09
+    - FRAME_COUNTER_09
+    - RESERVED_09
+    - MSG_LENGTH_09
+    - WEEK_09
+    - GPS_TOW_S_09
+    - GPS_TOW_MICRO_09
+    - V_X
+    - V_Y
+    - V_Z
+    - STATUS_09
+    - CRC16_09
+  packet_type: parser
+  encoding: binary
+  binary_format: "<4B2H2I2d11f2Hf2BH2fI2H4B2H2I6f2H4B2H2I2df2H4B2H2I3f2H4B2H2I3f2H"
+
+00d00d:
+  name: SONIC
+  instruments:
+    - SONIC
+  parameters:
+    - U
+    - V
+    - W
+    - T
+    - STATUS
+    - COUNTER
+    - CHECKSUM
+  packet_type: parser
+  encoding: ascii
+  cleaning_regex:
+    - '[^0-9\-.a-z]+'

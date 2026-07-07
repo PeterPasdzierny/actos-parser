@@ -1,0 +1,17 @@
+[project]
+name = "actos-parser-nightly"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.14"
+dependencies = [
+    "pyyaml>=6.0.3",
+]
+
+[project.scripts]
+actos-parser-nightly = "actos_parser:actos_parser"
+
+[tool.setuptools]
+py-modules = [
+    "actos_parser",
+    "actos_functions",
+]
