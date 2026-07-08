@@ -218,8 +218,11 @@ def convert_ints_to_voltages(sid, telegrams):
 
 
 def save_to_csv(flight, sid, telegrams):
-    outdir = cli_args.output or flight.parent / flight_cfg["defaults"]["output_subdir"]
-    outdir.mkdir(exist_ok=True)
+    outdir = (
+        cli_args.output / flight.parent.name / flight_cfg["defaults"]["output_subdir"]
+        or flight.parent / flight_cfg["defaults"]["output_subdir"]
+    )
+    outdir.mkdir(exist_ok=True, parents=True)
     outpath = outdir / f"{sid}_{flight_cfg[sid]['name']}.csv"
     with outpath.open("w", newline="") as outfile:
         writer = csv.writer(outfile)
