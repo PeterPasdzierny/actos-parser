@@ -1,14 +1,12 @@
 # ACTOS config C3SAR 2026
 
 defaults:
+  output_subdir: l1_decoded_data
   timestamp_name: DATETIME
   timestamp_format: "%Y-%m-%dT%H:%M:%S.%f"
-  output_subdir: l1_decoded_data
 
 abc00e:
   name: PTB
-  instruments:
-    - PTB
   parameters:
     - PRESSURE
   packet_type: packetizer
@@ -18,8 +16,6 @@ abc00e:
 
 abc01e:
   name: HMP
-  instruments:
-    - HMP
   parameters:
     - RH
     - TEMPERATURE
@@ -31,8 +27,6 @@ abc01e:
 
 abc04e:
   name: STAP
-  instruments:
-    - STAP
   parameters:
     - INVMM_R
     - INVMM_G
@@ -63,8 +57,6 @@ abc04e:
 
 abc05e:
   name: POPS
-  instruments:
-    - POPS
   parameters:
     - DATETIME_POPS
     - PARTCT
@@ -99,8 +91,6 @@ abc05e:
 
 abc06e:
   name: MCPC
-  instruments:
-    - MCPC
   parameters:
     - CONCENT
     - RAWCONC
@@ -127,8 +117,6 @@ abc06e:
 
 abc07e:
   name: MSEMS
-  instruments:
-    - MSEMS
   parameters: (SEE BELOW)
   packet_type: packetizer
   encoding: ascii
@@ -138,8 +126,6 @@ abc07e:
 
 abc08e:
   name: LICOR
-  instruments:
-    - LICOR
   parameters:
     - NDX
     - DIAGVAL
@@ -165,8 +151,6 @@ abc08e:
 
 abc09e:
   name: SONIC
-  instruments:
-    - SONIC
   parameters:
     - U
     - V
@@ -182,20 +166,23 @@ abc09e:
 
 abc10e:
   name: CDP
-  instruments:
-    - CDP
   parameters:
     - TO BE DONE
   packet_type: packetizer
   encoding: binary
-  binary_format: ">8HI5H31I6s256IH"
-  export_raw_telegrams: True
-  packets_per_telegram: 3
+  endian: word_swap_16
+  binary_schema:
+    - uint16*8
+    - uint32
+    - uint16*5
+    - uint32*31
+    - uint48
+    - packed12_20*256
+    - uint16
+  udp_packets_per_telegram: 3
 
 abc11e:
   name: LWC
-  instruments:
-    - DMT_LWC
   parameters:
     - UNKNOWN
   packet_type: packetizer
@@ -206,8 +193,6 @@ abc11e:
 
 abc12e:
   name: CPCI
-  instruments:
-    - CPC_I
   parameters:
     - COUNT
   packet_type: packetizer
@@ -217,8 +202,6 @@ abc12e:
 
 abc13e:
   name: CPCII
-  instruments:
-    - CPC_II
   parameters:
     - COUNT
   packet_type: packetizer
@@ -228,8 +211,6 @@ abc13e:
 
 abc14e:
   name: AERORH
-  instruments:
-    - AERORH
   parameters:
     - DATETIME_AERORH
     - TEMP_SHT
@@ -248,8 +229,6 @@ abc14e:
 
 00def0:
   name: PTB
-  instruments:
-    - PTP
   parameters:
     - PRESSURE
   packet_type: parser
@@ -259,8 +238,6 @@ abc14e:
 
 00def1:
   name: HMP
-  instruments:
-    - HMP
   parameters:
     - DEWPOINT
     - RH
@@ -272,30 +249,27 @@ abc14e:
 
 00def2:
   name: CPCS
-  instruments:
-    - CPCI
-    - CPCII
-    - MCPC
   parameters:
     - CPC1
     - CPC2
     - MCPC
   packet_type: parser
   encoding: binary
-  binary_format: ">3H"
+  endian: big
+  binary_schema:
+    - uint16*3
 
 00def3:
   name: PVM
-  instruments:
-    - PVM
-    - LY_ALPHA
   parameters:
     - LWC
     - PSA
     - LY_ALPHA
   packet_type: parser
   encoding: binary
-  binary_format: ">6H"
+  endian: big
+  binary_schema:
+    - uint16*6
   commutation_factor: 2
   voltage_ranges:
     - [0, 5]
@@ -304,9 +278,6 @@ abc14e:
 
 00def4:
   name: DEWPOINT
-  instruments:
-    - DPTT
-    - PT100
   parameters:
     - T_DP
     - T_REF
@@ -314,7 +285,9 @@ abc14e:
     - PT_100
   packet_type: parser
   encoding: binary
-  binary_format: ">4H"
+  endian: big
+  binary_schema:
+    - uint16*4
   voltage_ranges:
     - [-10, 10]
     - [-10, 10]
@@ -323,9 +296,6 @@ abc14e:
 
 00def5:
   name: HOUSEKEEPING
-  instruments:
-    - HOUSEKEEPING
-    - FILTER
   parameters:
     - CWS_SWITCH
     - FILTER_SWITCH
@@ -342,8 +312,9 @@ abc14e:
     - FILTER_4
   packet_type: parser
   encoding: binary
-  # binary_format: ">9H"
-  binary_format: ">13H"
+  endian: big
+  binary_schema:
+    - uint16*13
   voltage_ranges:
     - [0, 10]
     - [0, 10]
@@ -354,15 +325,13 @@ abc14e:
     - [0, 10]
     - [0, 10]
     - [0, 10]
-    # - [0, 10]
-    # - [0, 10]
-    # - [0, 10]
-    # - [0, 10]
+    - [0, 10]
+    - [0, 10]
+    - [0, 10]
+    - [0, 10]
 
 00def6:
   name: RADIATION
-  instruments:
-    - RADIATION
   parameters:
     - CGR4_DOWN
     - CGR4_DOWN_T
@@ -372,7 +341,9 @@ abc14e:
     - CMP22_UP
   packet_type: parser
   encoding: binary
-  binary_format: ">6H"
+  endian: big
+  binary_schema:
+    - uint16*6
   voltage_ranges:
     - [-0.02, 0.02]
     - [-10, 10]
@@ -383,28 +354,28 @@ abc14e:
 
 00def7:
   name: LICOR
-  instruments:
-    - LICOR
-    - PITOT
   parameters:
     - CO2
     - H20
     - PITOT_STATIC
     - PITOT_HEATER
+    - FILTER_PUMP
   packet_type: parser
   encoding: binary
-  binary_format: ">40H"
+  endian: big
+  binary_schema:
+    - uint16*40
+    # - uint16*50
   commutation_factor: 10
   voltage_ranges:
     - [0, 5]
     - [0, 5]
     - [-10, 10]
     - [0, 10]
+    - [0, 10]
 
 00def8:
   name: IMAR
-  instruments:
-    - IMAR
   parameters:
     - SYNC_12
     - MSG_ID_12
@@ -495,12 +466,44 @@ abc14e:
     - CRC16_09
   packet_type: parser
   encoding: binary
-  binary_format: "<4B2H2I2d11f2Hf2BH2fI2H4B2H2I6f2H4B2H2I2df2H4B2H2I3f2H4B2H2I3f2H"
+  endian: little
+  binary_schema:
+    - uint8*4
+    - uint16*2
+    - uint32*2
+    - float64*2
+    - float32*11
+    - uint16*2
+    - float32
+    - uint8*2
+    - uint16
+    - float32*2
+    - uint32
+    - uint16*2
+    - uint8*4
+    - uint16*2
+    - uint32*2
+    - float32*6
+    - uint16*2
+    - uint8*4
+    - uint16*2
+    - uint32*2
+    - float64*2
+    - float32
+    - uint16*2
+    - uint8*4
+    - uint16*2
+    - uint32*2
+    - float32*3
+    - uint16*2
+    - uint8*4
+    - uint16*2
+    - uint32*2
+    - float32*3
+    - uint16*2
 
 00d00d:
   name: SONIC
-  instruments:
-    - SONIC
   parameters:
     - U
     - V

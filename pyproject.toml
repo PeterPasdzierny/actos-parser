@@ -4,6 +4,7 @@ version = "1.0.0"
 description = "Python script to extract and decode measurement data from pcap files captured during ACTOS research flight operation"
 requires-python = ">=3.14"
 dependencies = [
+    "construct>=2.10.70",
     "pyyaml>=6.0.3",
 ]
 

@@ -29,18 +29,25 @@ def actos_parser():
             print(f"Processing stream-id: {sid}")
 
             stream_telegrams = flight_telegrams[sid]
-            if "packets_per_telegram" in flight_cfg[sid]:
+            if "udp_packets_per_telegram" in flight_cfg[sid]:
                 stream_telegrams = reassamble_fragmented_telegrams(
-                    flight_cfg[sid]["packets_per_telegram"], stream_telegrams
+                    flight_cfg[sid]["udp_packets_per_telegram"], stream_telegrams
                 )
-            if "export_raw_telegrams" in flight_cfg[sid]:
+            if flight_cfg[sid].get("export_raw_telegrams"):
                 stream_telegrams = format_for_raw_export(stream_telegrams)
                 save_to_csv(flight, sid, stream_telegrams)
+                continue
+            # if flight_cfg[sid].get("endianness") == "mixed":
+            #     stream_telegrams = convert_mixed_to_big_endian(stream_telegrams)
             if flight_cfg[sid]["encoding"] == "ascii":
-                stream_telegrams = decode_ascii(sid, stream_telegrams)
+                stream_telegrams = decode_ascii(stream_telegrams)
                 stream_telegrams = clean_ascii(sid, stream_telegrams)
             if flight_cfg[sid]["encoding"] == "binary":
                 stream_telegrams = decode_binary(sid, stream_telegrams)
+            if flight_cfg[sid].get("commutation_factor"):
+                stream_telegrams = decommutate_telegrams(sid, stream_telegrams)
+            if flight_cfg[sid].get("voltage_ranges"):
+                stream_telegrams = convert_ints_to_voltages(sid, stream_telegrams)
             save_to_csv(flight, sid, stream_telegrams)
 
     print("Ex(c)iting ACTOS parser")
