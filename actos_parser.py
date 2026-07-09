@@ -3,7 +3,7 @@ from collections import defaultdict
 
 
 def actos_parser():
-    print("Starting ACTOS parser")
+    print("Starting ACTOS parser, yeaahhh!")
 
     cli_args = get_cli_args()
     flight_cfg = get_config(cli_args.config)
@@ -22,6 +22,9 @@ def actos_parser():
                     payload=udp_packet[80:]
                     if flight_cfg[sid]["packet_type"] == "packetizer"
                     else udp_packet[70:],
+                    is_fragmented=udp_packet[78] >> 4 & 1
+                    if flight_cfg[sid]["packet_type"] == "packetizer"
+                    else None,
                 )
                 flight_telegrams[sid].append(telegram)
 
@@ -33,12 +36,10 @@ def actos_parser():
                 stream_telegrams = reassamble_fragmented_telegrams(
                     flight_cfg[sid]["udp_packets_per_telegram"], stream_telegrams
                 )
-            if flight_cfg[sid].get("export_raw_telegrams"):
+            if flight_cfg[sid].get("export_as_raw_data"):
                 stream_telegrams = format_for_raw_export(stream_telegrams)
                 save_to_csv(flight, sid, stream_telegrams)
                 continue
-            # if flight_cfg[sid].get("endianness") == "mixed":
-            #     stream_telegrams = convert_mixed_to_big_endian(stream_telegrams)
             if flight_cfg[sid]["encoding"] == "ascii":
                 stream_telegrams = decode_ascii(stream_telegrams)
                 stream_telegrams = clean_ascii(sid, stream_telegrams)

@@ -20,7 +20,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import re
 from struct import unpack
-from typing import List
+from typing import Any, List, Tuple
 import yaml
 
 
@@ -28,20 +28,20 @@ def get_cli_args():
     argparser = ArgumentParser()
     argparser.add_argument(
         "--config",
-        help="ACTOS config file to use for flight processing",
+        help="ACTOS config file to use for processing of given flights",
         required=True,
         type=Path,
     )
     argparser.add_argument(
         "--flights",
         nargs="+",
-        help="List of ACTOS pcap file directories to process",
+        help="List of ACTOS pcap file flight directories to process",
         required=True,
         type=Path,
     )
     argparser.add_argument(
         "--output",
-        help="Optional non-default output directory for decoded flight data",
+        help="Optional non-default (parent) output directory for decoded flight(s) data",
         required=False,
         type=Path,
     )
@@ -74,8 +74,9 @@ def get_udp_packets(pcap_file):
 
 @dataclass
 class Telegram:
-    ptp: bytes | datetime
-    payload: bytes | List[int | float]
+    ptp: bytes | str
+    payload: bytes | List[Any] | Tuple[Any]
+    is_fragmented: int | None = None
 
 
 ptp_format = flight_cfg["defaults"]["timestamp_format"]
@@ -88,8 +89,15 @@ def parse_ptp(ptp_raw, ptp_format):
 
 
 def reassamble_fragmented_telegrams(udp_packets_per_telegram, telegrams):
-    len_telegrams = len(telegrams) - len(telegrams) % udp_packets_per_telegram
-    for i in range(0, len_telegrams, udp_packets_per_telegram):
+    for i in range(len(telegrams)):
+        if telegrams[i].is_fragmented == 0:
+            start_index = i
+            break
+    len_telegrams = (
+        len(telegrams[start_index:])
+        - len(telegrams[start_index:]) % udp_packets_per_telegram
+    )
+    for i in range(start_index, len_telegrams, udp_packets_per_telegram):
         payload = b"".join(
             telegrams[i + j].payload for j in range(udp_packets_per_telegram)
         )
@@ -98,7 +106,7 @@ def reassamble_fragmented_telegrams(udp_packets_per_telegram, telegrams):
 
 def format_for_raw_export(telegrams):
     for t in telegrams:
-        yield Telegram(ptp=parse_ptp(t.ptp, ptp_format), payload=[t.payload.hex()])
+        yield Telegram(ptp=parse_ptp(t.ptp, ptp_format), payload=(t.payload.hex()))
 
 
 def decode_ascii(telegrams):
@@ -125,18 +133,18 @@ class WordSwap16(Adapter):
         return int.from_bytes(swapped, "big")
 
 
-class Packed12_20(Adapter):
+class Packed20_12(Adapter):
     def _decode(self, obj, context, path):
         return {
-            "u12": obj >> 20,
-            "u20": obj & 0xFFFFF,
+            "u20": obj >> 12,
+            "u12": obj & 0xFFF,
         }
 
 
 UInt16Mixed = WordSwap16(Bytes(2))
 UInt32Mixed = WordSwap16(Bytes(4))
 UInt48Mixed = WordSwap16(Bytes(6))
-Packed12_20Mixed = Packed12_20(UInt32Mixed)
+Packed20_12Mixed = Packed20_12(UInt32Mixed)
 
 
 config_to_construct_type_map = {
@@ -158,7 +166,7 @@ config_to_construct_type_map = {
         "uint16": UInt16Mixed,
         "uint32": UInt32Mixed,
         "uint48": UInt48Mixed,
-        "packed12_20": Packed12_20Mixed,
+        "packed12_20": Packed20_12Mixed,
     },
 }
 
