@@ -120,11 +120,15 @@ def decode_ascii(telegrams):
 
 
 def clean_ascii(sid, telegrams):
-    pattern = re.compile("|".join(flight_cfg[sid]["cleaning_regex"]))
+    # pattern = re.compile("|".join(flight_cfg[sid]["cleaning_regex"]))
+    patterns = flight_cfg[sid]["cleaning_regex"]
     dedublicate_commas = re.compile(r",+")
     for t in telegrams:
-        cleaned_payload = pattern.sub(",", t.payload)
-        cleaned_payload = dedublicate_commas.sub(",", cleaned_payload).strip(",")
+        # cleaned_payload = pattern.sub(",", t.payload)
+        payload = t.payload
+        for pattern in patterns:
+            payload = re.sub(pattern, ",", payload)
+        cleaned_payload = dedublicate_commas.sub(",", payload).strip(",")
         parameter_list = cleaned_payload.split(",")
         yield Telegram(ptp=t.ptp, payload=parameter_list)
 
