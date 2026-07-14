@@ -84,7 +84,7 @@ ptp_format = flight_cfg["defaults"]["timestamp_format"]
 
 def parse_ptp(ptp_raw, ptp_format):
     seconds, nanoseconds = unpack(">2I", ptp_raw)
-    ptp = datetime.fromtimestamp(seconds=seconds, tz=UTC) + timedelta(
+    ptp = datetime.fromtimestamp(timestamp=seconds, tz=UTC) + timedelta(
         microseconds=nanoseconds / 1000
     )
     return datetime.strftime(ptp, ptp_format)
