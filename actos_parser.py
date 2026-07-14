@@ -3,7 +3,7 @@ from collections import defaultdict
 
 
 def actos_parser():
-    print("Starting ACTOS parser, yeaahhh!")
+    print("Starting ACTOS parser")
 
     cli_args = get_cli_args()
     flight_cfg = get_config(cli_args.config)

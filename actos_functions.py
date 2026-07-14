@@ -16,7 +16,7 @@ from construct import (
 )
 import csv
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from pathlib import Path
 import re
 from struct import unpack
@@ -72,7 +72,7 @@ def get_udp_packets(pcap_file):
             yield pcap_file.read(pcap_length)
 
 
-@dataclass
+@dataclass(slots=True)
 class Telegram:
     ptp: bytes | str
     payload: bytes | List[Any] | Tuple[Any]
@@ -84,7 +84,9 @@ ptp_format = flight_cfg["defaults"]["timestamp_format"]
 
 def parse_ptp(ptp_raw, ptp_format):
     seconds, nanoseconds = unpack(">2I", ptp_raw)
-    ptp = datetime.fromtimestamp(seconds) + timedelta(microseconds=nanoseconds / 1000)
+    ptp = datetime.fromtimestamp(seconds=seconds, tz=UTC) + timedelta(
+        microseconds=nanoseconds / 1000
+    )
     return datetime.strftime(ptp, ptp_format)
 
 
@@ -226,10 +228,7 @@ def convert_ints_to_voltages(sid, telegrams):
 
 
 def save_to_csv(flight, sid, telegrams):
-    outdir = (
-        cli_args.output / flight.parent.name / flight_cfg["defaults"]["output_subdir"]
-        or flight.parent / flight_cfg["defaults"]["output_subdir"]
-    )
+    outdir = cli_args.output or flight.parent / flight_cfg["defaults"]["output_subdir"]
     outdir.mkdir(exist_ok=True, parents=True)
     outpath = outdir / f"{sid}_{flight_cfg[sid]['name']}.csv"
     with outpath.open("w", newline="") as outfile:
